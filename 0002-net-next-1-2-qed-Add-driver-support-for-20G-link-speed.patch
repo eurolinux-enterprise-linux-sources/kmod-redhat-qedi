@@ -1,0 +1,45 @@
+From patchwork Tue Oct  2 13:16:11 2018
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: [net-next,1/2] qed: Add driver support for 20G link speed.
+X-Patchwork-Submitter: Sudarsana Reddy Kalluru <sudarsana.kalluru@cavium.com>
+X-Patchwork-Id: 977843
+Message-Id: <20181002131612.10859-2-sudarsana.kalluru@cavium.com>
+To: <davem@davemloft.net>
+Cc: <netdev@vger.kernel.org>, <Michal.Kalderon@cavium.com>
+Date: Tue, 2 Oct 2018 06:16:11 -0700
+From: Sudarsana Reddy Kalluru <sudarsana.kalluru@cavium.com>
+List-Id: <netdev.vger.kernel.org>
+
+Add driver support for configuring/reading the 20G link speed.
+
+Signed-off-by: Sudarsana Reddy Kalluru <Sudarsana.Kalluru@cavium.com>
+Signed-off-by: Michal Kalderon <Michal.Kalderon@cavium.com>
+---
+ drivers/net/ethernet/qlogic/qed/qed_dev.c  |  3 +++
+ drivers/net/ethernet/qlogic/qed/qed_hsi.h  |  2 ++
+ drivers/net/ethernet/qlogic/qed/qed_main.c | 11 +++++++++++
+ include/linux/qed/qed_if.h                 |  9 +++++----
+ 4 files changed, 21 insertions(+), 4 deletions(-)
+
+Index: src/include/linux/qed/qed_if.h
+===================================================================
+--- src.orig/include/linux/qed/qed_if.h	2018-10-02 17:52:24.120176007 +0200
++++ src/include/linux/qed/qed_if.h	2018-10-02 17:52:26.968118291 +0200
+@@ -670,10 +670,11 @@
+ 	QED_LM_1000baseT_Half_BIT = BIT(4),
+ 	QED_LM_1000baseT_Full_BIT = BIT(5),
+ 	QED_LM_10000baseKR_Full_BIT = BIT(6),
+-	QED_LM_25000baseKR_Full_BIT = BIT(7),
+-	QED_LM_40000baseLR4_Full_BIT = BIT(8),
+-	QED_LM_50000baseKR2_Full_BIT = BIT(9),
+-	QED_LM_100000baseKR4_Full_BIT = BIT(10),
++	QED_LM_20000baseKR2_Full_BIT = BIT(7),
++	QED_LM_25000baseKR_Full_BIT = BIT(8),
++	QED_LM_40000baseLR4_Full_BIT = BIT(9),
++	QED_LM_50000baseKR2_Full_BIT = BIT(10),
++	QED_LM_100000baseKR4_Full_BIT = BIT(11),
+ 	QED_LM_COUNT = 11
+ };
+ 

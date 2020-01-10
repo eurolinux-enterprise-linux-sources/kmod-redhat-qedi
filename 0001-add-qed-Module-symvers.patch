@@ -1,0 +1,10 @@
+Index: src/drivers/scsi/qedi/Makefile
+===================================================================
+--- src.orig/drivers/scsi/qedi/Makefile	2018-08-20 07:07:12.437632814 +0200
++++ src/drivers/scsi/qedi/Makefile	2018-08-20 07:09:54.120088473 +0200
+@@ -1,3 +1,5 @@
++KBUILD_EXTRA_SYMBOLS := /usr/share/kmod-redhat-qed/Module.symvers
++
+ obj-$(CONFIG_QEDI) := qedi.o
+ qedi-y := qedi_main.o qedi_iscsi.o qedi_fw.o qedi_sysfs.o \
+ 	    qedi_dbg.o qedi_fw_api.o

@@ -1,0 +1,160 @@
+From patchwork Thu Sep 27 12:15:35 2018
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Patchwork-Submitter: Nilesh Javali <Nilesh.Javali@cavium.com>
+X-Patchwork-Id: 10617947
+Return-Path: <linux-scsi-owner@kernel.org>
+Received: from mail.wl.linuxfoundation.org (pdx-wl-mail.web.codeaurora.org
+ [172.30.200.125])
+	by pdx-korg-patchwork-2.web.codeaurora.org (Postfix) with ESMTP id B493A174A
+	for <patchwork-linux-scsi@patchwork.kernel.org>;
+ Thu, 27 Sep 2018 12:15:41 +0000 (UTC)
+Received: from mail.wl.linuxfoundation.org (localhost [127.0.0.1])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id A3A7D2B24A
+	for <patchwork-linux-scsi@patchwork.kernel.org>;
+ Thu, 27 Sep 2018 12:15:41 +0000 (UTC)
+Received: by mail.wl.linuxfoundation.org (Postfix, from userid 486)
+	id 977A42B25E; Thu, 27 Sep 2018 12:15:41 +0000 (UTC)
+X-Spam-Checker-Version: SpamAssassin 3.3.1 (2010-03-16) on
+	pdx-wl-mail.web.codeaurora.org
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.9 required=2.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,MAILING_LIST_MULTI,RCVD_IN_DNSWL_HI autolearn=ham version=3.3.1
+Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
+	by mail.wl.linuxfoundation.org (Postfix) with ESMTP id 0EAAC2B24A
+	for <patchwork-linux-scsi@patchwork.kernel.org>;
+ Thu, 27 Sep 2018 12:15:40 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S1727216AbeI0Sdk (ORCPT
+        <rfc822;patchwork-linux-scsi@patchwork.kernel.org>);
+        Thu, 27 Sep 2018 14:33:40 -0400
+Received: from mail-by2nam03on0055.outbound.protection.outlook.com
+ ([104.47.42.55]:18106
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727169AbeI0Sdk (ORCPT <rfc822;linux-scsi@vger.kernel.org>);
+        Thu, 27 Sep 2018 14:33:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=CAVIUMNETWORKS.onmicrosoft.com; s=selector1-cavium-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YMabjNVAoOQIheLwr1hFTdPqH5w7hQfrC/qOhoy4uqY=;
+ b=iUZaHItFGQhwqTwv93v9Cw2R6wqa2b3piOx1bB/dz5jib62fkiDueLpUAM1P0eVUnyq2UX8trFfs1yDBMiQzAQtHBlic2O7lstjjbtbaAV/Bwx0kj95sTVXquvy18eKpYLl3t1MY1bgz4iSsXApWv6WEkyK32ZnRmif98I0Ge0M=
+Received: from DM6PR07CA0017.namprd07.prod.outlook.com (2603:10b6:5:94::30) by
+ SN6PR07MB4400.namprd07.prod.outlook.com (2603:10b6:805:58::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1143.18; Thu, 27 Sep 2018 12:15:37 +0000
+Received: from DM3NAM05FT041.eop-nam05.prod.protection.outlook.com
+ (2a01:111:f400:7e51::202) by DM6PR07CA0017.outlook.office365.com
+ (2603:10b6:5:94::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1164.22 via Frontend
+ Transport; Thu, 27 Sep 2018 12:15:37 +0000
+Authentication-Results: spf=pass (sender IP is 50.232.66.26)
+ smtp.mailfrom=cavium.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
+ header.from=cavium.com;
+Received-SPF: Pass (protection.outlook.com: domain of cavium.com designates
+ 50.232.66.26 as permitted sender) receiver=protection.outlook.com;
+ client-ip=50.232.66.26; helo=CAEXCH02.caveonetworks.com;
+Received: from CAEXCH02.caveonetworks.com (50.232.66.26) by
+ DM3NAM05FT041.mail.protection.outlook.com (10.152.98.155) with Microsoft SMTP
+ Server (version=TLS1_0, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA_P256) id
+ 15.20.1185.5 via Frontend Transport; Thu, 27 Sep 2018 12:15:36 +0000
+Received: from dut1171.mv.qlogic.com (172.29.51.171) by
+ CAEXCH02.caveonetworks.com (10.17.4.29) with Microsoft SMTP Server id
+ 14.2.347.0; Thu, 27 Sep 2018 05:15:36 -0700
+Received: from dut1171.mv.qlogic.com (localhost [127.0.0.1])    by
+ dut1171.mv.qlogic.com (8.14.7/8.14.7) with ESMTP id w8RCFZGp015878;
+    Thu, 27
+ Sep 2018 05:15:35 -0700
+Received: (from root@localhost) by dut1171.mv.qlogic.com
+ (8.14.7/8.14.7/Submit) id w8RCFZSZ015877;
+      Thu, 27 Sep 2018 05:15:35 -0700
+From: Nilesh Javali <nilesh.javali@cavium.com>
+To: <martin.petersen@oracle.com>, <lduncan@suse.com>,
+        <cleech@redhat.com>
+CC: <linux-scsi@vger.kernel.org>, <QLogic-Storage-Upstream@cavium.com>
+Subject: [PATCH] qedi: Initialize the stats mutex lock
+Date: Thu, 27 Sep 2018 05:15:35 -0700
+Message-ID: <20180927121535.15843-1-nilesh.javali@cavium.com>
+X-Mailer: git-send-email 2.12.0
+MIME-Version: 1.0
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-Forefront-Antispam-Report: 
+ CIP:50.232.66.26;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(396003)(39860400002)(376002)(136003)(346002)(2980300002)(438002)(199004)(189003)(44832011)(14444005)(26005)(186003)(87636003)(4326008)(47776003)(86362001)(575784001)(51416003)(34290500001)(36756003)(1076002)(478600001)(106002)(2201001)(69596002)(50466002)(48376002)(72206003)(486006)(80596001)(50226002)(8676002)(42186006)(316002)(8936002)(2616005)(16586007)(81156014)(5660300001)(126002)(2906002)(476003)(305945005)(107886003)(356003)(54906003)(110136005)(336012)(1857600001)(106466001)(81166006);DIR:OUT;SFP:1101;SCL:1;SRVR:SN6PR07MB4400;H:CAEXCH02.caveonetworks.com;FPR:;SPF:Pass;LANG:en;PTR:50-232-66-26-static.hfc.comcastbusiness.net;A:1;MX:1;
+X-Microsoft-Exchange-Diagnostics: 
+ 1;DM3NAM05FT041;1:o2qrkzNZ/qP2wLnB+OJoNw7Df86fQwoysNl4LpXP569CzI+n+0fK0kCSqZ6+BJ3NHldOqbqxkBrd2PcLwwNxycrqfS2XcoWnHBTx5bvZnZoy4+4y2cVk8SmVNTAIXIOi
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a9da9850-b6f5-4072-19a7-08d62472eed5
+X-Microsoft-Antispam: 
+ BCL:0;PCL:0;RULEID:(7020095)(4652040)(8989299)(4534165)(4627221)(201703031133081)(201702281549075)(8990200)(5600074)(711020)(4608076)(2017052603328)(7153060);SRVR:SN6PR07MB4400;
+X-Microsoft-Exchange-Diagnostics: 
+ 1;SN6PR07MB4400;3:Mj+IZFwCsXdkVlY/4jNS4W8g7JosAz/mLx222caJt9PBPjrSi250+IBVvy4nPa2QVLesLVRbS1Brd/jwXoVdbn3kqzYfa3kJ8/A6xZqjMwXv+/xzkB/okUPg1yWsfeW8nSSjmTq87eN4j5d0Cg1AH/JGdtOD8D/FDcloBPoCT/leyUV++lj30yYbnvq2nKuRGV0QYa4vsLg3Vai08aaPZbOmNJG8MmJXpwWJXdd49cJJJduZ3UP43U5OGLtnuJA9987YHyakZ7FkEKDo5ZlEp4f/XDGWQK0QKRC02MyxwOlmyX+AktkmSkqNosL9xCaVK/kSuemVGCr4QoFe/42UOFdnEttKUK9Cw3ngxh6WzUA=;25:QW5gN+vBWIREQeNGubyykxAcVokMOIR2MLRoAaadJA0ZAtGH5lh3+7NE/4hiWjqclK3lqieXUNNKS9G1gXrDIGJjEG+pHFXLMpVKjgoAKx3Dw1083gl3y+C8gxXuqGYVMiDQVz+TNvXM5TajlNMyPm5zCGCsisl3VJy5cPFoE84UHV8i7Mf9GfSl9DuU05OZfYPrh00GuYH11SzMUdjigDBqfM8YeYaS4aw7D9QlOn7VlehaQIn7NA5oWyquw1SE9DnMVfpmL+kxBKn7CJmHkFnZPtzg1ndIsxsaglpmURP6IQkQN9DC9S70QyiLhlXcvTemZDUb5a3KSHACaIQG0Q==
+X-MS-TrafficTypeDiagnostic: SN6PR07MB4400:
+X-Microsoft-Exchange-Diagnostics: 
+ 1;SN6PR07MB4400;31:g3sCtE1DjxXMk/aGEksK3Ar1YaAjqskZ6QCWXlIkc+E8rJqacBsy2paNfYeBbRLy030mL+T3oSsw4Cr+/iP79dIIORngqFpjHxUuxHzdix9ZImTKI745ftwilEgbf3N4ZwvnQS1NV2/3FLXDGU44RekQVrKLbl3SnR7VaaB1QBhWQQEpnJfmEwz73Cen4fGz0gzXkh6H/1zsHOb5/GAdHmUKEQBBeTd3h9YoKCUBokY=;20:BdxxBGixPNZN3/Dy+muEikoA09c/Zhk/gNE5fCz9+8Ykqoj2SX7GLsf+UrmmQKckRuHF8swk4pCPij7aK6JzOUJc4h/ufUJLZphHm/GCXJYrytOzWqHNPxzR2NZeU5K1YSVuHgY0nsZMNU8WOxWvvJZ9DNw1bSZyXzw8xROynp2MBS2Qw+/gLh4vPgbRka5SUVQjcC9tg68oV0926KiQzC8vrP5vFwSlcIsBoNlpFXaFVexwQfvPbPjzWHaAszkH7lQv9X56o0Nh975Rueu++iN8cjjQ0H4hfELhMSM4J4TX/eME34/kyZHXszUYXjRMJE/QLGkKWcA7N8DFI5iKKfCW8CKcOTpQC3VF70w8/vBr1o/acYaG0OfelzQj/qczw3aPxuEr1dJX+v/mGpdfvsRu35mlgZdB/WH/K9R6VtblrGnNHY7cX7+Zk4woqu/b25WQ1nehwvwFV0b9RZfG5/NaKpRudAKEvVm92+GKUaTRXfTvhdVr6HvtowPPLn+h
+X-Microsoft-Antispam-PRVS: 
+ <SN6PR07MB44007525C22AE997C29D58AB92140@SN6PR07MB4400.namprd07.prod.outlook.com>
+X-Exchange-Antispam-Report-Test: UriScan:;
+X-MS-Exchange-SenderADCheck: 1
+X-Exchange-Antispam-Report-CFA-Test: 
+ BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(5005006)(8121501046)(3231355)(944501410)(52105095)(3002001)(10201501046)(93006095)(93004095)(149066)(150057)(6041310)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123558120)(20161123564045)(20161123562045)(201708071742011)(7699051);SRVR:SN6PR07MB4400;BCL:0;PCL:0;RULEID:;SRVR:SN6PR07MB4400;
+X-Microsoft-Exchange-Diagnostics: 
+ 1;SN6PR07MB4400;4:B2gy3nFks2XdhO+XGPlqsWGcTj4ARsnmidXbjQbo5zi4gEInxaoTxrgL0tkodhPn/7nM3gAovQnwwxRIt7sJ6WO6AEO2DUwtsAlU4pZCMb8aVfDxuwpQBKGNKKEZvDFKhuGRgIEudIZ2MqezVdfZ+KKcyHzeeuQ0AULbq90rlE6VZSqDl8N0tv4k7SPo6bhmQpW0iHhQcAKYaglLZuWSYPH1ZNGfeqe3d8ODa4I0NqocQGU5eXEC+FBiG1CFzAAgdhd34ux6h8roDgbJo2kmDw==
+X-Forefront-PRVS: 0808323E97
+X-Microsoft-Exchange-Diagnostics: 
+ 1;SN6PR07MB4400;23:+idoBcgtWelNjFf3dCfg6heVBktTdWq/qSpjiCd0UWJAaSBaQ3j35gQJMgnfrYPY+i5dXFjtUAgvroP5DJFniryV2ar44GipOvTrR7xzhpEmvrahkX2oOYcMIcSuUDCRQkl1wWTzvOmYnjp2YKWK/d51hTyIh+tlKT3g8b83E9ge7T722vv08i1EpastJD5/y9I8N1Wu9kCXfcIlKKTw6lijs8L3YHKgT+FCRCHqwVThVn0QRfvvTPrH1vzsQWwfN5gpR0TM3mQIHmM71glGrTwz8L9l1A3vVpy9/rXIAxTX4ozWYVdWn/6iHT6zJreIE21t/1Je7R44TsLy771eXgTwMlQVm0TYh00Kn0aEzib20ortSUGj1IJV+2yQzmE9nnx5RvM5amOvcdOp12XL6uvaqosN4A8oMpZ2h7iKqkfWmvvi2KA3UI0wDADnCku5fmRrjkLeOd98sqdBGQaXwMvWUQ1LTbd78LSQ2NEGnAt6fX+7l5L9RJQVn348N1zz2v1kY5mJkX36o6OZwjZNuaIiWO7gbpJLSGjU8gAG20jffi4fIDKQFQ55Vdqbs5VBfqTJWSC/cYw8kRB0iNu5vWO2bbFsIwvkLoshYH8LH/jwt4BWkbmJeYs3XIIYYogT6L1opSpQKhUl4aepUO7mEjvSmC/HnuIhGT6PIpBvM2yuIqJ2pOsRcvpSN+QTXDOyVLFlBLK+6d+GrIDn30Ct3BL1gXFGocSRgz9TLRB8TG2rO/QIegNkVKoglUMz2BP02N5qJWt3ieq+XAsOXJ18vQg2JoEH97BhY4YVOXSoSy55c4gYP3cAKod7P092GS7obPAsGqvOn2FpJsNnphDcqYiey9SyOJiU0cSHhix6cvPASaEbLRv3G+wPt4XbY9Keqpk061kQx2+vs3LlS3fJw0iYvdJqy6sWYQxfvq4pVwUxFIiq60Y90unEd00LqkmIS50lqpqCqwEFYd0AYus459U8Na7Dj4wk9YUBxs5fbvoIUAKInMoAyYKX/1SLjd3m96YhqAOP24/qF16aO+BwyQ7Xn4mFpK9woNQyU0muRa/Vz+cpN9XtrmjOAQIzfstcKcOc+yzHtfs59h0R150B43FYC8CUmDwKtFGGIAlWjaFzlyl3QCX5n0gDgSr3zKRbKlDxKZUItCE/LsrCIrNLNA==
+X-Microsoft-Antispam-Message-Info: 
+ e3BDmIuPb3J2GQngZQedCFo2ykLZOnxot/Tq2oygOE5GNYJ7M4LyVPyDsMjEukiLtoTANs4fxFN+ORrKd/mTKDtkt7eS9WquZL+9Cq/zSkNsB62wfibHy6g4EOjNlDzGve3b37OgFXktWlNqnmvmtkfoM1nhai3xiWrOZBWadu31FBObmnaFK7b2LyIFsFQmVpTYVqhgB4GnxQwvEncpVSV6Dxyq2/uE0wKfwS1bRztiJagsDd9gu5HUYXMBiXpzYGp9EGeAz48JXsIPAHzxI4frP94qUYQap70R09/l0MRtDz2B+TPeBBNPaZTHwnb0+Cko+aLRoqxDYhzEGF09t4k/63AgEbb2+KeZx/h/KvQ=
+X-Microsoft-Exchange-Diagnostics: 
+ 1;SN6PR07MB4400;6:icx6qdcBV5YZjmUC0hO6nAW5sgLWb6bERR8oCVgY3mCgn9qsAatRAcYDjo6vikgTB92+cnqQPHLIP+Wu3PCO47lRZhpahU5cjsKCpmMRvWmWLVlFrRJZsCDKYh4SL0aJ5719bCqAlMYxDstgAquvBe/u2bOCnbsx5Sd6QSTftnLy+G14UMttF9G5ida1OJmD2b+p9v8gWIzZOa6e0HMQXPH57RsRYz8n4gfYNan0zn74UAr33dOIktFOFLns5FqtKnfD7r1q06DTbakBx8AJiiFiEyIqneyaWHlItjsW3CYgY+Wq8MJFMn1eDYE78VyZh9R2KCeJyVgMIKqZHsLnOQUQ8Hsx0O4U9Sx6NfdOahOMnbLaNw3OooKdND7Rbm7hL1GRsch7xHbor0Y01Nor+UNkbUFeqjsikfOApgZJaYoAxj/75LpG9bmcadQJ19lWlQVkUbVNHYnfWhSm9dDGqw==;5:XkGjG+sKWx2XB9CHzgRP1D9jeTYfFi4dvJUcfG0lCjWtAlY1zClyxRsT++P9IS00+lMxexNOhxvk5G69ZOTaWy7F8Gotld8Rla1VjFgvz9mnU5Lw/2IfvOqC4TvqqFfseLWKtTeHVW1pUOI3TJ1IB3s/hqivsfAiO0CGZrn9Hjk=;7:p3OKd6muO0ALSOdEPy4CK6IVk7Tsjr4x/Sq+fMJ75HQzAQTAtXaO2ux/OpekZX8R1kQFmJiTs30F9KFVJp/K72FR8V076EXBrfjtU/G9S0w/zI1iKD1X6X1BXT4KhhLDcpdzzxvBZl/pLp+I8PCXqnn1vn+8ZHpH9UGmYM1bemHd+u7Xd5GgDL8xosAJSuF+3mRNrD6rZj8Son5VmkLCM07Apa6A1xCFDyfYVEvNDRu8qnnNfaxoz0vM+6MQjhVl
+SpamDiagnosticOutput: 1:99
+SpamDiagnosticMetadata: NSPM
+X-OriginatorOrg: cavium.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Sep 2018 12:15:36.8193
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 
+ a9da9850-b6f5-4072-19a7-08d62472eed5
+X-MS-Exchange-CrossTenant-Id: 711e4ccf-2e9b-4bcf-a551-4094005b6194
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: 
+ TenantId=711e4ccf-2e9b-4bcf-a551-4094005b6194;Ip=[50.232.66.26];Helo=[CAEXCH02.caveonetworks.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR07MB4400
+Sender: linux-scsi-owner@vger.kernel.org
+Precedence: bulk
+List-ID: <linux-scsi.vger.kernel.org>
+X-Mailing-List: linux-scsi@vger.kernel.org
+X-Virus-Scanned: ClamAV using ClamSMTP
+
+Fix kernel NULL pointer dereference,
+
+Call Trace:
+  [<ffffffff9b7658e6>] __mutex_lock_slowpath+0xa6/0x1d0
+  [<ffffffff9b764cef>] mutex_lock+0x1f/0x2f
+  [<ffffffffc061b5e1>] qedi_get_protocol_tlv_data+0x61/0x450 [qedi]
+  [<ffffffff9b1f9d8e>] ? map_vm_area+0x2e/0x40
+  [<ffffffff9b1fc370>] ? __vmalloc_node_range+0x170/0x280
+  [<ffffffffc0b81c3d>] ? qed_mfw_process_tlv_req+0x27d/0xbd0 [qed]
+  [<ffffffffc0b6461b>] qed_mfw_fill_tlv_data+0x4b/0xb0 [qed]
+  [<ffffffffc0b81c59>] qed_mfw_process_tlv_req+0x299/0xbd0 [qed]
+  [<ffffffff9b02a59e>] ? __switch_to+0xce/0x580
+  [<ffffffffc0b61e5b>] qed_slowpath_task+0x5b/0x80 [qed]
+
+Signed-off-by: Nilesh Javali <nilesh.javali@cavium.com>
+---
+ drivers/scsi/qedi/qedi_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+Index: src/drivers/scsi/qedi/qedi_main.c
+===================================================================
+--- src.orig/drivers/scsi/qedi/qedi_main.c	2018-11-07 15:37:03.874767789 +0100
++++ src/drivers/scsi/qedi/qedi_main.c	2018-11-07 15:37:08.013735225 +0100
+@@ -2508,6 +2508,7 @@
+ 		/* start qedi context */
+ 		spin_lock_init(&qedi->hba_lock);
+ 		spin_lock_init(&qedi->task_idx_lock);
++		mutex_init(&qedi->stats_lock);
+ 	}
+ 	qedi_ops->ll2->register_cb_ops(qedi->cdev, &qedi_ll2_cb_ops, qedi);
+ 	qedi_ops->ll2->start(qedi->cdev, &params);
